@@ -1,17 +1,11 @@
-from fastapi import FastAPI, Request, UploadFile, Form, File, Depends
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from uploaded_releases import uploaded_link_image, release_dates
-from login_data import administration
+from fastapi import Request, UploadFile, Form, File, Depends, HTTPException
+from fastapi.responses import HTMLResponse
+from fastapi.security import HTTPBasicCredentials
 
-app = FastAPI()
+from application.login_data import administration
+from application.uploaded_releases import uploaded_link_image, release_dates
+from .app import app, templates, security
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
-
-security = HTTPBasic()
 
 @app.get("/", response_class=HTMLResponse)
 async def home_page(request: Request):
@@ -32,6 +26,7 @@ async def upload_form(request: Request):
 async def login_form(request: Request):
     static_url = app.url_path_for("static", path="")
     return templates.TemplateResponse("login.html", {"request": request, "static_url": static_url})
+
 
 @app.post("/login")
 async def login(credentials: HTTPBasicCredentials = Depends(security)):
