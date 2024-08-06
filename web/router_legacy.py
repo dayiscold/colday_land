@@ -1,10 +1,10 @@
 from fastapi import Request, UploadFile, Form, File, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.security import HTTPBasicCredentials
-
 from application.login_data import administration
 from application.uploaded_releases import uploaded_link_image, release_dates
 from .app import app, templates, security
+from crud import get_site_info
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -50,3 +50,8 @@ async def upload_photo(request: Request, photo: UploadFile = File(...), photo_li
     uploaded_link_image[photo_link] = image_url
     release_dates[photo_link] = int(release_date[0:4] + release_date[5:7] + release_date[8:])
     return {"message": "Релиз загружен"}
+
+
+@app.get("/api/v1/site_info")
+async def read_site_info():
+    return get_site_info()
