@@ -4,7 +4,7 @@ from fastapi.security import HTTPBasicCredentials
 from application.login_data import administration
 from application.uploaded_releases import uploaded_link_image, release_dates
 from .app import app, templates, security
-from crud import get_site_info
+
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -52,6 +52,3 @@ async def upload_photo(request: Request, photo: UploadFile = File(...), photo_li
     return {"message": "Релиз загружен"}
 
 
-@app.get("/api/v1/site_info")
-async def read_site_info():
-    return get_site_info()

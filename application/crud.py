@@ -1,14 +1,26 @@
-from fastapi import FastAPI
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from database import SiteInfo, Base, SessionLocal
-from datetime import datetime
-def add_site_info(name, description, year, links):
-    session = SessionLocal()
-    site_info = SiteInfo(name=name, description=description, year=year, links=links)
-    session.add(site_info)
-    session.commit()
-    session.close()
+from database import SiteInfo, SessionLocal
+from fastapi import Depends
+from sqlalchemy.orm import Session
+
+
+def get_db_session():
+    """Receives Session Database"""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+def add_site_info(name: str, description: str, year: int, db: Session = Depends(get_db_session())):
+    session = db
+    try:
+        site_info = SiteInfo(name=name, description=description, year=year, links=links)
+        session.add(site_info)
+        session.commit()
+    finally:
+        session.close()
+
 
 def get_site_info():
     session = SessionLocal()
@@ -20,25 +32,3 @@ def get_site_info():
         "year": site_info.year,
         "links": site_info.links
     }
-
-add_site_info(name="COLDAY", description="все для души.", year=datetime.now().year, links=[
-    {
-        "id": "1000",
-        "url": "https://t.me/coldaybigstepper",
-        "type": "telegram",
-        "path": "/static/tg.png"
-    },
-    {
-        "id": "1001",
-        "url": "https://vk.com/luxurycolday",
-        "type": "vk",
-        "path": "/static/vk.png"
-    },
-    {
-        "id": "1002",
-        "url": "https://steamcommunity.com/id/martyraycolday/",
-        "type": "steam",
-        "path": "/static/steam.png"
-    }
-])
-
