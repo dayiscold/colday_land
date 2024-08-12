@@ -160,5 +160,4 @@ cython_debug/
 .idea/
 
 site_info.db
-database.py
 local/

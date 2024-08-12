@@ -1,5 +1,4 @@
-from fastapi import FastAPI
-from crud import get_site_info
+from crud import get_site_info, edit_site_info
 from pydantic import BaseModel
 from datetime import datetime
 from typing import List
@@ -23,3 +22,9 @@ class SiteInfoSchema(BaseModel):
     description: str = "все для души."
     year: int = datetime.now().year
     links: List[Link]
+
+
+@app.post("/api/v1/site_info")
+async def change_site_info():
+    """Return changed information Links"""
+    return edit_site_info()
