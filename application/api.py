@@ -1,4 +1,4 @@
-from crud import get_site_info, edit_site_info
+from crud import get_site_info, edit_site_info, get_photo_releases_list
 from pydantic import BaseModel
 from datetime import datetime
 from typing import List
@@ -28,3 +28,17 @@ class SiteInfoSchema(BaseModel):
 async def change_site_info():
     """Return changed information Links"""
     return edit_site_info()
+
+
+@app.get("api/v1/photos")
+async def photo_handler():
+    """Return Releases List with Photos"""
+    return get_photo_releases_list()
+
+
+class PhotoHandlerSchema(BaseModel):
+    id: int
+    created_at: int
+    updated_at: int | None
+    description: str | None
+    link: str

@@ -1,8 +1,9 @@
-from database import SiteInfo, SessionLocal
+from database import SiteInfo, SessionLocal, ReleasesInfo
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from local.main_links_data import links
 from fastapi.security import OAuth2PasswordBearer
+from typing import List
 
 security = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -57,3 +58,26 @@ def edit_site_info(name: str, description: str, year: int, current_user: User = 
         raise HTTPException(status_code=status.HTTP_500, detail="Not credentials")
     finally:
         session.close()
+
+
+def get_photo_releases_list(releases: str = None) -> List[dict]:
+    session = SessionLocal()
+    if releases == "all":
+        releases = session.query(ReleasesInfo).all()
+    else:
+        releases = session.query(ReleasesInfo).order_by(ReleasesInfo.created_at.desc()).limit(3).all()
+    photos_list = []
+    for release in releases:
+        photo = {
+            "id": release.id,
+            "created_at": release.created_at,
+            "updated_at": release.updated_at,
+            "description": release.description,
+            "link": release.link
+        }
+        photos_list.append(photo)
+    return photos_list
+
+
+
+
