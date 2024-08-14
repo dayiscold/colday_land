@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form action="/upload_photo" method="post" enctype="multipart/form-data">
+    <input type="file" name="photo">
+    <input type="text" name="photo_link" placeholder="Enter photo link">
+    <label for="release_date">Выберите дату:</label>
+    <input type="date" id="release_date" name="release_date">
+    <button type="submit">Добавить релиз</button>
+</form>
+</body>
+</html>
