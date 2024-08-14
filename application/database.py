@@ -17,7 +17,7 @@ class SiteInfo(Base):
     name = Column(String)
     description = Column(String)
     year = Column(Integer)
-    links = Column(JSON)
+    links = Column(JSON(none_as_null=True))
 
 
 # Создаем таблицу в базе данных

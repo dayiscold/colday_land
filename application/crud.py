@@ -1,6 +1,8 @@
 from datetime import datetime
+from http import HTTPStatus
 from typing import List
 
+from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -30,7 +32,11 @@ class SiteInfoSchema(BaseModel):
     name: str
     description: str
     year: int = datetime.now().year
-    links: List[LinksSchema]
+    links: List[LinksSchema] | None
+
+
+class SiteInfoLinksSchema(BaseModel):
+    links: List[LinksSchema] | None
 
 
 class SiteInfoEdit(BaseModel):
@@ -39,7 +45,13 @@ class SiteInfoEdit(BaseModel):
 
 def get_site_info(session: Session) -> SiteInfoSchema:
     site_info = session.query(SiteInfo).first()
-    return SiteInfoSchema(name=site_info.name, description=site_info.description, links=site_info.links)
+    if not site_info:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Нет информации о сайте")
+    return SiteInfoSchema(
+        name=site_info.name,
+        description=site_info.description,
+        links=SiteInfoLinksSchema.model_validate(site_info.links).links,
+    )
 
 
 def edit_site_info(
@@ -50,11 +62,10 @@ def edit_site_info(
         session.query(SiteInfo).delete()
         session.add(
             SiteInfo(
-                id=site_info.id,
                 name=site_info.name,
                 description=site_info.description,
                 year=site_info.year,
-                links=site_info.links,
+                links=SiteInfoLinksSchema(links=site_info.links).model_dump(mode="json"),
             )
         )
         session.commit()
