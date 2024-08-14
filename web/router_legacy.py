@@ -9,16 +9,14 @@ from .app import app, templates, security
 
 @app.get("/", response_class=HTMLResponse)
 async def home_page(request: Request):
-    sorted_uploaded_photos = sorted(uploaded_link_image.items(), key=lambda x: release_dates.get(x[0], 0), reverse=True)
-    sorted_uploaded_photos = dict(sorted_uploaded_photos)
     static_url = app.url_path_for("static", path="")
-    return templates.TemplateResponse("page.html", {"request": request, "static_url": static_url,
-                                                    "uploaded_photos": sorted_uploaded_photos})
+    return templates.TemplateResponse(
+        "page.html", {"request": request, "static_url": static_url, "uploaded_photos": []}
+    )
 
 
 @app.get("/upload_photo", response_class=HTMLResponse)
 async def upload_form(request: Request):
-    static_url = app.url_path_for("static", path="")
     return templates.TemplateResponse("upload_photo.html", {"request": request})
 
 
@@ -38,10 +36,15 @@ async def login(credentials: HTTPBasicCredentials = Depends(security)):
 
 
 @app.post("/upload_photo")
-async def upload_photo(request: Request, photo: UploadFile = File(...), photo_link: str = Form(...),
-                       release_date: str = Form(...), credentials: HTTPBasicCredentials = Depends(security)):
+async def upload_photo(
+    request: Request,
+    photo: UploadFile = File(...),
+    photo_link: str = Form(...),
+    release_date: str = Form(...),
+    credentials: HTTPBasicCredentials = Depends(security),
+):
     user = administration.get(credentials.username)
-    if not user or user["password"] != credentials.password:
+    if not user or user["password"] != credentials.password:  # typeing[index]
         raise HTTPException(status_code=401, detail="Неверные учетные данные")
     image_content = await photo.read()
     image_url = f"static/{photo.filename}"
