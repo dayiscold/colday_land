@@ -1,3 +1,1 @@
-administration = {"login": "rooter",
-                  "password": "retoor"
-                  }
+administration = {"rooter": {"login": "rooter", "password": "retoor"}}

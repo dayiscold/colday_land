@@ -1,9 +1,11 @@
-from database import SiteInfo, SessionLocal, ReleasesInfo
-from fastapi import Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from local.main_links_data import links
-from fastapi.security import OAuth2PasswordBearer
+from datetime import datetime
+from http import HTTPStatus
 from typing import List
+from fastapi import HTTPException, Depends, status
+from fastapi.security import OAuth2PasswordBearer
+from pydantic import BaseModel
+from sqlalchemy.orm import Session
+from database import SiteInfo, SessionLocal, ReleasesInfo
 
 security = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -17,51 +19,51 @@ def get_db_session():
         db.close()
 
 
-def add_site_info(name: str, description: str, year: int, db: Session = Depends(get_db_session())):
-    session = db
-    try:
-        site_info = SiteInfo(name=name, description=description, year=year, links=links)
-        session.add(site_info)
-        session.commit()
-    finally:
-        session.close()
+class LinksSchema(BaseModel):
+    id: str
+    url: str
+    type: str
+    path: str
 
 
-def get_site_info():
-    session = SessionLocal()
+class SiteInfoSchema(BaseModel):
+    name: str
+    description: str
+    year: int = datetime.now().year
+    links: List[LinksSchema] | None
+
+
+class SiteInfoLinksSchema(BaseModel):
+    links: List[LinksSchema] | None
+
+
+class SiteInfoEdit(BaseModel):
+    message: str
+
+
+class PhotoHandlerSchema(BaseModel):
+    id: int
+    created_at: datetime
+    updated_at: datetime | None
+    description: str | None
+    link: str
+
+def get_current_user(session: Session):
+    pass
+
+def get_site_info(session: Session) -> SiteInfoSchema:
     site_info = session.query(SiteInfo).first()
-    session.close()
-    return {
-        "name": site_info.name,
-        "description": site_info.description,
-        "year": site_info.year,
-        "links": site_info.links
-    }
+    if not site_info:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Нет информации о сайте")
+    return SiteInfoSchema(
+        name=site_info.name,
+        description=site_info.description,
+        links=SiteInfoLinksSchema.model_validate(site_info.links).links,
+    )
 
 
-def edit_site_info(name: str, description: str, year: int, current_user: User = Depends(get_current_user),
-                   db: Session = Depends(get_db_session())):
-    if not current_user:
-        raise HTTPException(status_code=status.HTTP_401, detail="Not credentials")
-    session = db
-    try:
-        site_info = session.query(SiteInfo).first()
-        if site_info:
-            site_info.name = name
-            site_info.description = description
-            site_info.year = year
-            site_info.links = links
-            return {"details": "Сохранено"}
-        else:
-            raise HTTPException(status_code=status.HTTP_500, detail="Not credentials")
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500, detail="Not credentials")
-    finally:
-        session.close()
 
-
-def get_photo_releases_list(releases: str = None) -> List[dict]:
-    session = SessionLocal()
+def get_photo_releases_list(releases: str = None, session=Session) -> PhotoHandlerSchema:
     if releases == "all":
         releases = session.query(ReleasesInfo).all()
     else:
@@ -73,11 +75,24 @@ def get_photo_releases_list(releases: str = None) -> List[dict]:
             "created_at": release.created_at,
             "updated_at": release.updated_at,
             "description": release.description,
-            "link": release.link
+            "link": release.link,
         }
         photos_list.append(photo)
     return photos_list
 
 
-
-
+def edit_site_info(
+        site_info: SiteInfoSchema,
+        session: Session,
+) -> None:
+    with session.begin():
+        session.query(SiteInfo).delete()
+        session.add(
+            SiteInfo(
+                name=site_info.name,
+                description=site_info.description,
+                year=site_info.year,
+                links=SiteInfoLinksSchema(links=site_info.links).model_dump(mode="json"),
+            )
+        )
+        session.commit()
