@@ -1,0 +1,16 @@
+{
+  "name": "colday-frontend-monorepo",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "--parallel build",
+    "generate": "openapi-ts --input http://localhost:5000/openapi.json --output ./src/shared/api --client axios",
+    "lint": "--parallel lint"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@hey-api/openapi-ts": "^0.52.0"
+  },
+  "packageManager": "pnpm@9.7.1+sha256.46f1bbc8f8020aa9869568c387198f1a813f21fb44c82f400e7d1dbde6c70b40"
+}
