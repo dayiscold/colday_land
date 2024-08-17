@@ -44,7 +44,7 @@ async def upload_photo(
     credentials: HTTPBasicCredentials = Depends(security),
 ):
     user = administration.get(credentials.username)
-    if not user or user["password"] != credentials.password:  # typeing[index]
+    if not user or user["password"] != credentials.password:
         raise HTTPException(status_code=401, detail="Неверные учетные данные")
     image_content = await photo.read()
     image_url = f"static/{photo.filename}"
