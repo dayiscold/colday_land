@@ -104,7 +104,7 @@ def edit_site_info(
         session.commit()
 
 @app.post("/api/v1/photo")
-    async def append_photo(session: Session, photo: PhotoAddSchema, file: UploadFile = File()) -> None:
+    async def append_photo(session: Session, photo: PhotoAddSchema, file: UploadFile = File()):
         with open(f"/path/to/save/{file.filename}", "wb") as file_object:
             file_object.write(file.file.read())
         new_photo = PhotoFileReleases(file=file.filename, link=photo.link)
