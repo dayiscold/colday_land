@@ -2,6 +2,7 @@ from datetime import datetime
 from http import HTTPStatus
 from typing import List
 from fastapi import HTTPException, Depends, status, UploadFile, File
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -54,6 +55,8 @@ class PhotoAddSchema(BaseModel):
     file: str
     link: str
 
+class ReturnPhotoFromId(BaseModel):
+    id: int | None
 
 def get_current_user(session: Session):
     pass
@@ -105,7 +108,7 @@ def edit_site_info(
         session.commit()
 
 
-def append_photo(session: Session, photo: PhotoAddSchema, file: UploadFile = File()):
+def append_photo(session: Session,photo: PhotoAddSchema):
     with open(f"/path/to/save/{file.filename}", "wb") as file_object:
         file_object.write(file.file.read())
     new_photo = PhotoFileReleases(file=file.filename, link=photo.link)
@@ -114,7 +117,7 @@ def append_photo(session: Session, photo: PhotoAddSchema, file: UploadFile = Fil
     return {"details": "Сохранена"}
 
 
-def delete_photo(photo_id: int, session: Session):
+def delete_photo(photo_id: ReturnPhotoFromId, session: Session):
     photo = session.query(PhotoFileReleases).filter(PhotoFileReleases.id == photo_id).first()
     if photo is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Фотография не найдена")
@@ -123,3 +126,10 @@ def delete_photo(photo_id: int, session: Session):
     session.delete(photo)
     session.commit()
     return {"details": "Фото релиза удалено"}
+
+def return_photo_from_id(id: int = None, session: Session) -> ReturnPhotoFromId:
+    photo = db.query(PhotoFileReleases).filter(PhotoFileReleases.id == id).first()
+    if not photo:
+        raise HTTPException(status_code=404, detail="Фото не найдено")
+    image_data = photo.file
+    return StreamingResponse(iter([image_data]), media_type="image/jpeg")

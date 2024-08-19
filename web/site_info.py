@@ -1,7 +1,8 @@
 from fastapi import Depends
 from application.crud import get_site_info, edit_site_info, SiteInfoSchema, SiteInfoEdit, get_db_session, \
-    get_photo_releases_list, PhotoHandlerSchema, PhotoAddSchema
+    get_photo_releases_list, PhotoHandlerSchema, PhotoAddSchema, ReturnPhotoFromId, return_photo_from_id, append_photo
 from web.app import app
+from fastapi import HTTPException, Depends, status, UploadFile, File
 
 
 @app.get("/api/v1/site_info")
@@ -24,6 +25,11 @@ async def photo_handler(db=Depends(get_db_session)) -> PhotoHandlerSchema:
 
 
 @app.post("api/v1/photos")
-async def add_photo(db=Depends(get_db_session)) -> PhotoAddSchema:
+async def add_photo(photo: PhotoHandlerSchema, db=Depends(get_db_session)) -> PhotoAddSchema:
     """RETURN NEW PHOTO"""
-    return append_photo(session=db)
+    return append_photo(photo=session=db)
+
+@app.get("api/v1/photos/id")
+async def get_photo_from_id(db=Depends(get_db_session)) -> ReturnPhotoFromId:
+    "RETURN PHOTO WITH THE HELP IDENTIFIER"
+    return return_photo_from_id(id=int=None, session=db)
