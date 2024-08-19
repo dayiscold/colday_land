@@ -48,6 +48,7 @@ class PhotoHandlerSchema(BaseModel):
     description: str | None
     link: str
 
+
 class PhotoAddSchema(BaseModel):
     id: int
     file: str
@@ -56,6 +57,7 @@ class PhotoAddSchema(BaseModel):
 
 def get_current_user(session: Session):
     pass
+
 
 def get_site_info(session: Session) -> SiteInfoSchema:
     site_info = session.query(SiteInfo).first()
@@ -66,7 +68,6 @@ def get_site_info(session: Session) -> SiteInfoSchema:
         description=site_info.description,
         links=SiteInfoLinksSchema.model_validate(site_info.links).links,
     )
-
 
 
 def get_photo_releases_list(releases: str = None, session=Session) -> PhotoHandlerSchema:
@@ -103,11 +104,22 @@ def edit_site_info(
         )
         session.commit()
 
-@app.post("/api/v1/photo")
-    async def append_photo(session: Session, photo: PhotoAddSchema, file: UploadFile = File()):
-        with open(f"/path/to/save/{file.filename}", "wb") as file_object:
-            file_object.write(file.file.read())
-        new_photo = PhotoFileReleases(file=file.filename, link=photo.link)
-        session.add(new_photo)
-        session.commit()
-        return {"details": "Сохранена"}
+
+def append_photo(session: Session, photo: PhotoAddSchema, file: UploadFile = File()):
+    with open(f"/path/to/save/{file.filename}", "wb") as file_object:
+        file_object.write(file.file.read())
+    new_photo = PhotoFileReleases(file=file.filename, link=photo.link)
+    session.add(new_photo)
+    session.commit()
+    return {"details": "Сохранена"}
+
+
+def delete_photo(photo_id: int, session: Session):
+    photo = session.query(PhotoFileReleases).filter(PhotoFileReleases.id == photo_id).first()
+    if photo is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Фотография не найдена")
+    if not get_current_user():
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Действие доступно только для администратора")
+    session.delete(photo)
+    session.commit()
+    return {"details": "Фото релиза удалено"}
