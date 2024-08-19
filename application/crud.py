@@ -1,11 +1,11 @@
 from datetime import datetime
 from http import HTTPStatus
 from typing import List
-from fastapi import HTTPException, Depends, status
+from fastapi import HTTPException, Depends, status, UploadFile, File
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from database import SiteInfo, SessionLocal, ReleasesInfo
+from database import SiteInfo, SessionLocal, ReleasesInfo, PhotoFileReleases
 
 security = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -47,6 +47,12 @@ class PhotoHandlerSchema(BaseModel):
     updated_at: datetime | None
     description: str | None
     link: str
+
+class PhotoAddSchema(BaseModel):
+    id: int
+    file: str
+    link: str
+
 
 def get_current_user(session: Session):
     pass
@@ -96,3 +102,12 @@ def edit_site_info(
             )
         )
         session.commit()
+
+@app.post("/api/v1/photo")
+    async def append_photo(session: Session, photo: PhotoAddSchema, file: UploadFile = File()) -> None:
+        with open(f"/path/to/save/{file.filename}", "wb") as file_object:
+            file_object.write(file.file.read())
+        new_photo = PhotoFileReleases(file=file.filename, link=photo.link)
+        session.add(new_photo)
+        session.commit()
+        return {"details": "Сохранена"}

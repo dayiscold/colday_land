@@ -8,12 +8,13 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-class Base(DeclarativeBase): ...  # noqa: E701
+class Base(DeclarativeBase):  # noqa: E701
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+
 
 
 class SiteInfo(Base):
     __tablename__ = "site_info"
-    id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
     description = Column(String)
     year = Column(Integer)
@@ -22,10 +23,14 @@ class SiteInfo(Base):
 
 class ReleasesInfo(Base):
     __tablename__ = "releases_info"
-    id = Column(Integer, primary_key=True, index=True)
     created_at = Column(DateTime)
     updated_at = Column(DateTime, nullable=True)
     description = Column(String, nullable=True)
+    link = Column(String)
+
+class PhotoFileReleases(Base):
+    __tablename__ = "photofile_info"
+    file = Column(String)
     link = Column(String)
 
 
