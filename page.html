@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ static_url }}/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+    <title>
+        COLDAY
+    </title>
+</head>
+
+<body class="text-white" style="background-color: #000000; font-family: 'Times New Roman', Times, serif;">
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <div class="for soul">
+            <p class="navbar-brand">
+                все для души.
+            </p>
+        </div>
+        <div class="links">
+            <div class="d-flex flex-row align-items-center">
+                <a href="https://t.me/coldaybigstepper" class="logo-link">
+                    <img class="tg logo" src="{{ static_url }}/tg.png" width="59"/>
+                </a>
+                <a href="https://vk.com/luxurycolday" class="logo-link">
+                    <img class="vk logo" src="{{ static_url }}/vk.png" width="37"/>
+                </a>
+                <a href="https://steamcommunity.com/id/martyraycolday/" class="logo-link">
+                    <img class="steam-logo" src="{{ static_url }}/steam.png" width="77"/>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+<div class="content">
+    <div class="title-colday">
+        <div class="fade-in">
+            <h1 class="text-center fade-in">
+                <a href="https://band.link/colday" class="title-link">
+                    C O L D A Y
+                </a>
+            </h1>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+                {% for photo_link, photo_name in uploaded_photos.items() %}
+                <div class="mb-4">
+                    <a href="{{ photo_link }}">
+                        <img src="{{ photo_name }}" alt="Photo" width="500" height="500" class="img-fluid custom-image">
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="text-center text-lg-start">
+    <div class="text-center fs-5">
+        2024
+    </div>
+</footer>
+<script src="{{ static_url }}/script.js"></script>
+</script>
+</body>
+</html>
