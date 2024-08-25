@@ -7,6 +7,7 @@ export const uploadPhoto = (
     options: TMutationCustomOptions<AddPhotoApiV1PhotosPostResponse, unknown, (Blob | File | null)> = {}
 ) => {
     return useMutation<AddPhotoApiV1PhotosPostResponse, unknown, (Blob | File | null)>({
+        // @ts-ignore
         mutationFn: (values) => {
             if (values === null) return null;
             return addPhotoApiV1PhotosPost({formData: {file: values}})
