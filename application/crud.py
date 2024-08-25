@@ -1,11 +1,13 @@
+import base64
 from datetime import datetime
 from http import HTTPStatus
-from typing import List
-from fastapi import HTTPException, Depends, status, UploadFile, File
-from fastapi.responses import FileResponse, StreamingResponse
+from typing import List, Iterator
+
+from fastapi import HTTPException, status, UploadFile
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+
 from database import SiteInfo, SessionLocal, ReleasesInfo, PhotoFileReleases
 
 security = OAuth2PasswordBearer(tokenUrl="token")
@@ -42,21 +44,27 @@ class SiteInfoEdit(BaseModel):
     message: str
 
 
-class PhotoHandlerSchema(BaseModel):
+class ReleasesSchemaItem(BaseModel):
     id: int
     created_at: datetime
     updated_at: datetime | None
     description: str | None
+    file_id: str
     link: str
+
+
+class ReleasesSchema(BaseModel):
+    releases: list[ReleasesSchemaItem] = []
 
 
 class PhotoAddSchema(BaseModel):
     id: int
-    file: str
-    link: str
+    filename: str
+
 
 class ReturnPhotoFromId(BaseModel):
     id: int | None
+
 
 def get_current_user(session: Session):
     pass
@@ -73,27 +81,29 @@ def get_site_info(session: Session) -> SiteInfoSchema:
     )
 
 
-def get_photo_releases_list(releases: str = None, session=Session) -> PhotoHandlerSchema:
+def get_photo_releases_list(releases: str | None = None, session=Session) -> ReleasesSchema:
+    response = ReleasesSchema()
     if releases == "all":
-        releases = session.query(ReleasesInfo).all()
+        rows = session.query(ReleasesInfo).all()
     else:
-        releases = session.query(ReleasesInfo).order_by(ReleasesInfo.created_at.desc()).limit(3).all()
-    photos_list = []
-    for release in releases:
-        photo = {
-            "id": release.id,
-            "created_at": release.created_at,
-            "updated_at": release.updated_at,
-            "description": release.description,
-            "link": release.link,
-        }
-        photos_list.append(photo)
-    return photos_list
+        rows = session.query(ReleasesInfo).order_by(ReleasesInfo.created_at.desc()).limit(3).all()
+    for release in rows:
+        response.releases.append(
+            ReleasesSchemaItem(
+                id=release.id,
+                created_at=release.created_at,
+                updated_at=release.updated_at,
+                description=release.description,
+                file_id=release.file_id,
+                link=release.link,
+            )
+        )
+    return response
 
 
 def edit_site_info(
-        site_info: SiteInfoSchema,
-        session: Session,
+    site_info: SiteInfoSchema,
+    session: Session,
 ) -> None:
     with session.begin():
         session.query(SiteInfo).delete()
@@ -108,28 +118,27 @@ def edit_site_info(
         session.commit()
 
 
-def append_photo(session: Session,photo: PhotoAddSchema):
-    with open(f"/path/to/save/{file.filename}", "wb") as file_object:
-        file_object.write(file.file.read())
-    new_photo = PhotoFileReleases(file=file.filename, link=photo.link)
+def append_photo(file: UploadFile, session: Session) -> int:
+    encoded_string = base64.b64encode(file.file.read()).decode("utf-8")
+    new_photo = PhotoFileReleases(filename=file.filename, content=encoded_string)
     session.add(new_photo)
     session.commit()
-    return {"details": "Сохранена"}
+    return new_photo.id
 
 
-def delete_photo(photo_id: ReturnPhotoFromId, session: Session):
-    photo = session.query(PhotoFileReleases).filter(PhotoFileReleases.id == photo_id).first()
+def delete_photo(photo_id: ReturnPhotoFromId, session: Session) -> int:
+    if photo_id.id is None:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Не передан идентификатор")
+    photo = session.query(PhotoFileReleases).filter(PhotoFileReleases.id == photo_id.id).first()
     if photo is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Фотография не найдена")
-    if not get_current_user():
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Действие доступно только для администратора")
     session.delete(photo)
     session.commit()
-    return {"details": "Фото релиза удалено"}
+    return photo_id.id
 
-def return_photo_from_id(id: int = None, session: Session) -> ReturnPhotoFromId:
-    photo = db.query(PhotoFileReleases).filter(PhotoFileReleases.id == id).first()
+
+def return_photo_from_id(photo_id: int, session: Session) -> Iterator[bytes]:
+    photo: PhotoFileReleases | None = session.query(PhotoFileReleases).filter(PhotoFileReleases.id == photo_id).first()
     if not photo:
         raise HTTPException(status_code=404, detail="Фото не найдено")
-    image_data = photo.file
-    return StreamingResponse(iter([image_data]), media_type="image/jpeg")
+    yield base64.b64decode(photo.content.encode("utf-8"))
