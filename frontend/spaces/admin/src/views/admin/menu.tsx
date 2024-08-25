@@ -1,6 +1,6 @@
 import {Cell, Group, Header, PanelHeader} from "@vkontakte/vkui";
 import {AdminPanelMenu, AdminPanelMenuTitle} from "@/views/admin/base.tsx";
-import {Icon28ChainOutline, Icon28ListPlayOutline, Icon28UserOutline} from "@vkontakte/icons";
+import {Icon28ChainOutline, Icon28ListPlayOutline, Icon28UserOutline, Icon24PhotosStackOutline} from "@vkontakte/icons";
 
 type VKAdminMenuPanelProps = {
     id: AdminPanelMenu
@@ -32,6 +32,13 @@ const VKAdminMenuPanel = ({id, to}: VKAdminMenuPanelProps) => {
                 onClick={to.bind(to, AdminPanelMenu.aboutPlayAudio)}
             >
                 {AdminPanelMenuTitle.get(AdminPanelMenu.aboutPlayAudio)}
+            </Cell>
+            <Cell
+                expandable="auto"
+                before={<Icon24PhotosStackOutline/>}
+                onClick={to.bind(to, AdminPanelMenu.photos)}
+            >
+                {AdminPanelMenuTitle.get(AdminPanelMenu.photos)}
             </Cell>
         </Group>
     </>
