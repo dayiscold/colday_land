@@ -3,13 +3,10 @@ from http import HTTPStatus
 from typing import List
 
 from fastapi import HTTPException
-from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from database import SiteInfo, SessionLocal
-
-security = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def get_db_session():
