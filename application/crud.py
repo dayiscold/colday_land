@@ -6,6 +6,7 @@ from typing import List, Iterator
 from fastapi import HTTPException, status, UploadFile
 from pydantic import BaseModel
 from pydantic import Field
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from database import SiteInfo, SessionLocal, PhotoFileReleases, ReleasesInfo
@@ -73,6 +74,10 @@ class PhotoAddSchema(BaseModel):
     filename: str
 
 
+class PhotoListSchema(BaseModel):
+    photos: list[PhotoAddSchema] = []
+
+
 class ReturnPhotoFromId(BaseModel):
     id: int | None
 
@@ -108,6 +113,20 @@ def get_photo_releases_list(releases: str | None = None, session=Session) -> Rel
                 description=release.description,
                 file_id=release.file_id,
                 link=release.link,
+            )
+        )
+    return response
+
+
+def photo_list(session=Session) -> PhotoListSchema:
+    response = PhotoListSchema()
+    result = session.execute(select(PhotoFileReleases.id, PhotoFileReleases.filename))
+    photos = result.all()
+    for photo in photos:
+        response.photos.append(
+            PhotoAddSchema(
+                id=photo[0],
+                filename=photo[1],
             )
         )
     return response

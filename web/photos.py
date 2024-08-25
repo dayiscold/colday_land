@@ -8,8 +8,16 @@ from application.crud import (
     append_photo,
     delete_photo,
     ReturnPhotoFromId,
+    photo_list,
+    PhotoListSchema,
 )
 from web.app import app
+
+
+@app.get("/api/v1/photos/list", tags=["Photos"])
+async def get_photo_list(db=Depends(get_db_session)) -> PhotoListSchema:
+    """RETURN PHOTOS DATA LIST"""
+    return photo_list(session=db)
 
 
 @app.post("/api/v1/photos", tags=["Photos"])

@@ -87,4 +87,4 @@ class VKIDClient:
         return TypeAdapter[list[JWTModelProfile]].validate_python(object=payload, strict=False)
 
 
-vkid_client = VKIDClient()
+vkid_client = None
