@@ -5,6 +5,8 @@ import VKAdminMenuPanel from "@/views/admin/menu.tsx";
 import VkAdminAboutInfo from "@/views/admin/aboutInfo.tsx";
 import VkAdminAboutLinks from "@/views/admin/aboutLinks.tsx";
 import VkAdminAboutPlayAudio from "@/views/admin/aboutPlayAudio.tsx";
+import VkAdminPhotos from "@/views/admin/photos.tsx";
+import VkAdminPhotoUpload from "@/views/admin/photoUpload.tsx";
 
 const AdminPagePanel = () => {
     const [
@@ -22,6 +24,12 @@ const AdminPagePanel = () => {
         </Panel>
         <Panel id={AdminPanelMenu.aboutPlayAudio}>
             <VkAdminAboutPlayAudio id={AdminPanelMenu.aboutPlayAudio} to={setActivePanel}/>
+        </Panel>
+        <Panel id={AdminPanelMenu.photos}>
+            <VkAdminPhotos id={AdminPanelMenu.photos} to={setActivePanel}/>
+        </Panel>
+        <Panel id={AdminPanelMenu.upload_photos}>
+            <VkAdminPhotoUpload id={AdminPanelMenu.upload_photos} to={setActivePanel}/>
         </Panel>
     </View>
 }

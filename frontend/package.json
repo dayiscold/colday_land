@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "--parallel build",
-    "generate": "openapi-ts --input http://localhost:5000/openapi.json --output ./src/shared/api --client axios",
+    "generate": "openapi-ts --input http://localhost:5000/openapi.json --output ./packages/api/src --client axios",
     "lint": "--parallel lint"
   },
   "dependencies": {},

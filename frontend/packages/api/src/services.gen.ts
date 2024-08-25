@@ -3,7 +3,7 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { ReadSiteInfoApiV1SiteInfoGetResponse, ChangeSiteInfoApiV1SiteInfoPostData, ChangeSiteInfoApiV1SiteInfoPostResponse, HomePageGetResponse, UploadFormUploadPhotoGetResponse, UploadPhotoUploadPhotoPostData, UploadPhotoUploadPhotoPostResponse, LoginFormLoginGetResponse, LoginLoginPostResponse } from './types.gen';
+import type { ReadSiteInfoApiV1SiteInfoGetResponse, ChangeSiteInfoApiV1SiteInfoPostData, ChangeSiteInfoApiV1SiteInfoPostResponse, HomePageGetResponse, UploadFormUploadPhotoGetResponse, LoginFormLoginGetResponse, GetPhotoListApiV1PhotosListGetResponse, AddPhotoApiV1PhotosPostData, AddPhotoApiV1PhotosPostResponse, DeletePhotoByIdApiV1PhotosPhotoIdDeleteData, DeletePhotoByIdApiV1PhotosPhotoIdDeleteResponse, GetPhotoFromIdApiV1PhotosPhotoIdGetData, GetPhotoFromIdApiV1PhotosPhotoIdGetResponse, ReleasesHandlerApiV1ReleasesGetData, ReleasesHandlerApiV1ReleasesGetResponse, VkidFirstStepApiV1VkidFirstStepPostResponse, VkidSecondStepApiV1VkidSecondStepPostData, VkidSecondStepApiV1VkidSecondStepPostResponse, VkidLogoutApiV1VkidLogoutPostData, VkidLogoutApiV1VkidLogoutPostResponse } from './types.gen';
 
 /**
  * Read Site Info
@@ -55,23 +55,6 @@ export const uploadFormUploadPhotoGet = (): CancelablePromise<UploadFormUploadPh
 }); };
 
 /**
- * Upload Photo
- * @param data The data for the request.
- * @param data.formData
- * @returns unknown Successful Response
- * @throws ApiError
- */
-export const uploadPhotoUploadPhotoPost = (data: UploadPhotoUploadPhotoPostData): CancelablePromise<UploadPhotoUploadPhotoPostResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/upload_photo',
-    formData: data.formData,
-    mediaType: 'multipart/form-data',
-    errors: {
-        422: 'Validation Error'
-    }
-}); };
-
-/**
  * Login Form
  * @returns string Successful Response
  * @throws ApiError
@@ -82,11 +65,134 @@ export const loginFormLoginGet = (): CancelablePromise<LoginFormLoginGetResponse
 }); };
 
 /**
- * Login
+ * Get Photo List
+ * RETURN PHOTOS DATA LIST
+ * @returns PhotoListSchema Successful Response
+ * @throws ApiError
+ */
+export const getPhotoListApiV1PhotosListGet = (): CancelablePromise<GetPhotoListApiV1PhotosListGetResponse> => { return __request(OpenAPI, {
+    method: 'GET',
+    url: '/api/v1/photos/list'
+}); };
+
+/**
+ * Add Photo
+ * RETURN NEW PHOTO
+ * @param data The data for the request.
+ * @param data.formData
+ * @returns PhotoAddSchema Successful Response
+ * @throws ApiError
+ */
+export const addPhotoApiV1PhotosPost = (data: AddPhotoApiV1PhotosPostData): CancelablePromise<AddPhotoApiV1PhotosPostResponse> => { return __request(OpenAPI, {
+    method: 'POST',
+    url: '/api/v1/photos',
+    formData: data.formData,
+    mediaType: 'multipart/form-data',
+    errors: {
+        422: 'Validation Error'
+    }
+}); };
+
+/**
+ * Delete Photo By Id
+ * RETURN DELETE PHOTO
+ * @param data The data for the request.
+ * @param data.photoId
+ * @returns PhotoAddSchema Successful Response
+ * @throws ApiError
+ */
+export const deletePhotoByIdApiV1PhotosPhotoIdDelete = (data: DeletePhotoByIdApiV1PhotosPhotoIdDeleteData): CancelablePromise<DeletePhotoByIdApiV1PhotosPhotoIdDeleteResponse> => { return __request(OpenAPI, {
+    method: 'DELETE',
+    url: '/api/v1/photos/{photo_id}',
+    path: {
+        photo_id: data.photoId
+    },
+    errors: {
+        422: 'Validation Error'
+    }
+}); };
+
+/**
+ * Get Photo From Id
+ * RETURN PHOTO WITH THE HELP IDENTIFIER
+ * @param data The data for the request.
+ * @param data.photoId
  * @returns unknown Successful Response
  * @throws ApiError
  */
-export const loginLoginPost = (): CancelablePromise<LoginLoginPostResponse> => { return __request(OpenAPI, {
+export const getPhotoFromIdApiV1PhotosPhotoIdGet = (data: GetPhotoFromIdApiV1PhotosPhotoIdGetData): CancelablePromise<GetPhotoFromIdApiV1PhotosPhotoIdGetResponse> => { return __request(OpenAPI, {
+    method: 'GET',
+    url: '/api/v1/photos/{photo_id}',
+    path: {
+        photo_id: data.photoId
+    },
+    errors: {
+        422: 'Validation Error'
+    }
+}); };
+
+/**
+ * Releases Handler
+ * RETURN LIST RELEASES
+ * @param data The data for the request.
+ * @param data.releases
+ * @returns ReleasesSchema Successful Response
+ * @throws ApiError
+ */
+export const releasesHandlerApiV1ReleasesGet = (data: ReleasesHandlerApiV1ReleasesGetData = {}): CancelablePromise<ReleasesHandlerApiV1ReleasesGetResponse> => { return __request(OpenAPI, {
+    method: 'GET',
+    url: '/api/v1/releases',
+    query: {
+        releases: data.releases
+    },
+    errors: {
+        422: 'Validation Error'
+    }
+}); };
+
+/**
+ * Vkid First Step
+ * Return first step params to login page on vkid
+ * @returns VKIDFirstStepParams Successful Response
+ * @throws ApiError
+ */
+export const vkidFirstStepApiV1VkidFirstStepPost = (): CancelablePromise<VkidFirstStepApiV1VkidFirstStepPostResponse> => { return __request(OpenAPI, {
     method: 'POST',
-    url: '/login'
+    url: '/api/v1/vkid/first_step'
+}); };
+
+/**
+ * Vkid Second Step
+ * Return auth cookies
+ * @param data The data for the request.
+ * @param data.requestBody
+ * @returns unknown Successful Response
+ * @throws ApiError
+ */
+export const vkidSecondStepApiV1VkidSecondStepPost = (data: VkidSecondStepApiV1VkidSecondStepPostData): CancelablePromise<VkidSecondStepApiV1VkidSecondStepPostResponse> => { return __request(OpenAPI, {
+    method: 'POST',
+    url: '/api/v1/vkid/second_step',
+    body: data.requestBody,
+    mediaType: 'application/json',
+    errors: {
+        422: 'Validation Error'
+    }
+}); };
+
+/**
+ * Vkid Logout
+ * Clear auth cookies
+ * @param data The data for the request.
+ * @param data.requestBody
+ * @returns unknown Successful Response
+ * @throws ApiError
+ */
+export const vkidLogoutApiV1VkidLogoutPost = (data: VkidLogoutApiV1VkidLogoutPostData): CancelablePromise<VkidLogoutApiV1VkidLogoutPostResponse> => { return __request(OpenAPI, {
+    method: 'POST',
+    url: '/api/v1/vkid/logout',
+    body: data.requestBody,
+    mediaType: 'application/json',
+    errors: {
+        422: 'Validation Error'
+    }
 }); };
