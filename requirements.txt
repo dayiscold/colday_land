@@ -15,7 +15,7 @@ MarkupSafe==2.1.5
 multidict==6.0.5
 pkce==1.0.3
 pydantic==2.8.2
-pydantic_core==2.20.1
+pydantic_core==2.23.0
 PyJWT==2.9.0
 python-json-logger==2.0.7
 python-multipart==0.0.9
