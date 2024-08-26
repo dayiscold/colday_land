@@ -1,30 +1,27 @@
 import {PanelHeader, PanelHeaderBack} from "@vkontakte/vkui";
 import {AdminPanelMenu, AdminPanelMenuTitle} from "@/views/admin/base.tsx";
-import VkAdminFormPhotosUpload from "@colday/shared/src/components/adminPanel/formPhotoUpload";
-import {uploadPhoto} from "@colday/shared/src/queries/siteInfo/uploadPhoto";
+import {deletePhoto} from "@colday/shared/src/queries/siteInfo/deletePhoto";
 import {useAlert} from "@colday/shared/src/components/alerts/hooks";
+import VkAdminFormPhotosDelete from "@colday/shared/src/components/adminPanel/photoDelete/formPhotoDelete";
 
 
-type VkAdminPhotoUploadProps = {
+type VkAdminPhotoDeleteProps = {
     id: AdminPanelMenu
     to: (panel: AdminPanelMenu) => void
 }
-const VkAdminPhotoUpload = ({id, to}: VkAdminPhotoUploadProps) => {
+const VkAdminPhotoDelete = ({id, to}: VkAdminPhotoDeleteProps) => {
     const {showAlert, hideAlert} = useAlert()
-    const {mutate} = uploadPhoto({
+    const {mutate} = deletePhoto({
         onMutate: () => {
             hideAlert()
         },
-        onSuccess: (data) => {
-            showAlert({
-                type: "default",
-                message: `Загружено ${data?.id}`,
-            })
+        onSuccess: () => {
+            to(AdminPanelMenu.photos)
         },
         onError: () => {
             showAlert({
                 type: "error",
-                message: "Произошла ошибка при обновлении ссылок"
+                message: "Произошла ошибка при удалении фото"
             })
         }
     })
@@ -32,10 +29,7 @@ const VkAdminPhotoUpload = ({id, to}: VkAdminPhotoUploadProps) => {
         <PanelHeader before={
             <PanelHeaderBack label="Назад" onClick={to.bind(to, AdminPanelMenu.photos)}/>
         }>{AdminPanelMenuTitle.get(id)}</PanelHeader>
-        <VkAdminFormPhotosUpload
-            // @ts-ignore
-            onSubmit={mutate}
-        />
+        <VkAdminFormPhotosDelete onDelete={mutate}/>
     </>
 }
-export default VkAdminPhotoUpload;
+export default VkAdminPhotoDelete;
