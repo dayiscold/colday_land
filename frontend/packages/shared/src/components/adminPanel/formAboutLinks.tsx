@@ -1,12 +1,13 @@
-import {SiteInfoSchema} from "@colday/api";
+import {type GetPhotoListApiV1PhotosListGetResponse, SiteInfoSchema} from "@colday/api";
 import {useForm} from "@tanstack/react-form";
-import {Button, FormItem, Group, Header, Input} from "@vkontakte/vkui";
+import {Button, FormItem, Group, Header, Input, NativeSelect} from "@vkontakte/vkui";
 import {v4 as uuidv4} from 'uuid';
 import AdminGroupSpiner from "./spiner";
 import GroupAlerts from "../alerts/groupAlerts";
 
 type VkAdminAboutLinksFormProps = {
     values?: SiteInfoSchema
+    photos?: GetPhotoListApiV1PhotosListGetResponse
     isLoading?: boolean
     onSubmit: (values: SiteInfoSchema) => void
 }
@@ -14,7 +15,7 @@ const emptyValues: SiteInfoSchema = {
     name: '',
     description: '',
 }
-const VkAdminAboutLinksForm = ({values, isLoading, onSubmit}: VkAdminAboutLinksFormProps) => {
+const VkAdminAboutLinksForm = ({values, photos, isLoading, onSubmit}: VkAdminAboutLinksFormProps) => {
     const form = useForm({
         defaultValues: values || emptyValues,
         onSubmit: ({value}) => {
@@ -22,6 +23,12 @@ const VkAdminAboutLinksForm = ({values, isLoading, onSubmit}: VkAdminAboutLinksF
         }
     })
     if (isLoading) return <AdminGroupSpiner/>
+    const options = photos?.photos?.map((photo) => {
+        return <option key={`option-photo-url-${photo.id}`}
+                       value={`/api/v1/photos/${photo.id}`}>
+            {photo.id} {photo.filename}
+        </option>
+    });
     return <Group mode="card">
         <GroupAlerts/>
         <form
@@ -67,14 +74,18 @@ const VkAdminAboutLinksForm = ({values, isLoading, onSubmit}: VkAdminAboutLinksF
                                     children={(field) => {
                                         return (
                                             <FormItem top={`Адрес картинки ${i + 1}`} htmlFor={field.name}>
-                                                <Input
+                                                <NativeSelect
                                                     id={field.name}
-                                                    type="text"
-                                                    placeholder="Введите адрес картинкис"
+                                                    placeholder="Введите адрес картинки"
+                                                    onChange={
+                                                        (e) =>
+                                                            field.handleChange(e.target.value)
+                                                    }
                                                     value={field.state.value}
                                                     onBlur={field.handleBlur}
-                                                    onChange={(e) => field.handleChange(e.target.value)}
-                                                />
+                                                >
+                                                    {options}
+                                                </NativeSelect>
                                             </FormItem>
                                         )
                                     }}

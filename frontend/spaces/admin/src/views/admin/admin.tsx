@@ -7,6 +7,7 @@ import VkAdminAboutLinks from "@/views/admin/aboutLinks.tsx";
 import VkAdminAboutPlayAudio from "@/views/admin/aboutPlayAudio.tsx";
 import VkAdminPhotos from "@/views/admin/photos.tsx";
 import VkAdminPhotoUpload from "@/views/admin/photoUpload.tsx";
+import VkAdminPhotoDelete from "@/views/admin/photoDelete.tsx";
 
 const AdminPagePanel = () => {
     const [
@@ -28,9 +29,13 @@ const AdminPagePanel = () => {
         <Panel id={AdminPanelMenu.photos}>
             <VkAdminPhotos id={AdminPanelMenu.photos} to={setActivePanel}/>
         </Panel>
-        <Panel id={AdminPanelMenu.upload_photos}>
-            <VkAdminPhotoUpload id={AdminPanelMenu.upload_photos} to={setActivePanel}/>
+        <Panel id={AdminPanelMenu.uploadPhotos}>
+            <VkAdminPhotoUpload id={AdminPanelMenu.uploadPhotos} to={setActivePanel}/>
         </Panel>
+        <Panel id={AdminPanelMenu.deletePhotos}>
+            <VkAdminPhotoDelete id={AdminPanelMenu.deletePhotos} to={setActivePanel}/>
+        </Panel>
+
     </View>
 }
 const AdminPage = () => {

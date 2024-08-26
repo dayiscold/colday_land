@@ -4,7 +4,8 @@ export enum AdminPanelMenu {
     aboutLinks = "aboutLinks",
     aboutPlayAudio = "aboutPlayAudio",
     photos = "photos",
-    upload_photos = "upload_photos",
+    uploadPhotos = "uploadPhotos",
+    deletePhotos = "deletePhotos",
 }
 
 export const AdminPanelMenuTitle = new Map<AdminPanelMenu, string>([
@@ -13,5 +14,6 @@ export const AdminPanelMenuTitle = new Map<AdminPanelMenu, string>([
     [AdminPanelMenu.aboutLinks, "Ссылки"],
     [AdminPanelMenu.aboutPlayAudio, "Плеер"],
     [AdminPanelMenu.photos, "Фото"],
-    [AdminPanelMenu.upload_photos, "Загрузка фото"],
+    [AdminPanelMenu.uploadPhotos, "Загрузка фото"],
+    [AdminPanelMenu.deletePhotos, "Просмотр фото"],
 ])

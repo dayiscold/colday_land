@@ -4,6 +4,7 @@ import {useGetSiteInfo} from "@colday/shared/src/queries/siteInfo/getSiteInfo";
 import {editSiteInfo} from "@colday/shared/src/queries/siteInfo/editAboutInfo";
 import {useAlert} from "@colday/shared/src/components/alerts/hooks";
 import VkAdminAboutPlayAudioForm from "@colday/shared/src/components/adminPanel/formAboutPlayAudio";
+import { usePhotosInfo } from "@colday/shared/src/queries/siteInfo/getPhotosInfo";
 
 
 type VkAdminAboutPlayAudioProps = {
@@ -12,6 +13,7 @@ type VkAdminAboutPlayAudioProps = {
 }
 const VkAdminAboutPlayAudio = ({id, to}: VkAdminAboutPlayAudioProps) => {
     const {data, isLoading} = useGetSiteInfo();
+    const photos = usePhotosInfo();
     const {showAlert, hideAlert} = useAlert()
     const {mutate} = editSiteInfo({
         onMutate: () => {
@@ -35,8 +37,9 @@ const VkAdminAboutPlayAudio = ({id, to}: VkAdminAboutPlayAudioProps) => {
             <PanelHeaderBack label="Назад" onClick={to.bind(to, AdminPanelMenu.menu)}/>
         }>{AdminPanelMenuTitle.get(id)}</PanelHeader>
         <VkAdminAboutPlayAudioForm
-            isLoading={isLoading}
+            isLoading={isLoading || photos.isLoading}
             values={data}
+            photos={photos.data}
             onSubmit={mutate}
         />
     </>
