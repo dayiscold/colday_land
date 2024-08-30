@@ -3,7 +3,7 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { ReadSiteInfoApiV1SiteInfoGetResponse, ChangeSiteInfoApiV1SiteInfoPostData, ChangeSiteInfoApiV1SiteInfoPostResponse, HomePageGetResponse, UploadFormUploadPhotoGetResponse, LoginFormLoginGetResponse, GetPhotoListApiV1PhotosListGetResponse, AddPhotoApiV1PhotosPostData, AddPhotoApiV1PhotosPostResponse, DeletePhotoByIdApiV1PhotosPhotoIdDeleteData, DeletePhotoByIdApiV1PhotosPhotoIdDeleteResponse, GetPhotoFromIdApiV1PhotosPhotoIdGetData, GetPhotoFromIdApiV1PhotosPhotoIdGetResponse, ReleasesHandlerApiV1ReleasesGetData, ReleasesHandlerApiV1ReleasesGetResponse, VkidFirstStepApiV1VkidFirstStepPostResponse, VkidSecondStepApiV1VkidSecondStepPostData, VkidSecondStepApiV1VkidSecondStepPostResponse, VkidLogoutApiV1VkidLogoutPostData, VkidLogoutApiV1VkidLogoutPostResponse } from './types.gen';
+import type { ReadSiteInfoApiV1SiteInfoGetResponse, ChangeSiteInfoApiV1SiteInfoPostData, ChangeSiteInfoApiV1SiteInfoPostResponse, HomePageGetResponse, UploadFormUploadPhotoGetResponse, LoginFormLoginGetResponse, GetPhotoListApiV1PhotosListGetResponse, AddPhotoApiV1PhotosPostData, AddPhotoApiV1PhotosPostResponse, DeletePhotoByIdApiV1PhotosPhotoIdDeleteData, DeletePhotoByIdApiV1PhotosPhotoIdDeleteResponse, GetPhotoFromIdApiV1PhotosPhotoIdGetData, GetPhotoFromIdApiV1PhotosPhotoIdGetResponse, ReleasesHandlerApiV1ReleasesGetData, ReleasesHandlerApiV1ReleasesGetResponse, VkidFirstStepApiV1VkidFirstStepPostResponse, VkidSecondStepApiV1VkidSecondStepPostData, VkidSecondStepApiV1VkidSecondStepPostResponse, VkidProfileApiV1VkidProfileGetResponse, VkidLogoutApiV1VkidLogoutPostResponse } from './types.gen';
 
 /**
  * Read Site Info
@@ -180,19 +180,23 @@ export const vkidSecondStepApiV1VkidSecondStepPost = (data: VkidSecondStepApiV1V
 }); };
 
 /**
+ * Vkid Profile
+ * Return user profile
+ * @returns JWTModelProfile Successful Response
+ * @throws ApiError
+ */
+export const vkidProfileApiV1VkidProfileGet = (): CancelablePromise<VkidProfileApiV1VkidProfileGetResponse> => { return __request(OpenAPI, {
+    method: 'GET',
+    url: '/api/v1/vkid/profile'
+}); };
+
+/**
  * Vkid Logout
  * Clear auth cookies
- * @param data The data for the request.
- * @param data.requestBody
  * @returns unknown Successful Response
  * @throws ApiError
  */
-export const vkidLogoutApiV1VkidLogoutPost = (data: VkidLogoutApiV1VkidLogoutPostData): CancelablePromise<VkidLogoutApiV1VkidLogoutPostResponse> => { return __request(OpenAPI, {
+export const vkidLogoutApiV1VkidLogoutPost = (): CancelablePromise<VkidLogoutApiV1VkidLogoutPostResponse> => { return __request(OpenAPI, {
     method: 'POST',
-    url: '/api/v1/vkid/logout',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        422: 'Validation Error'
-    }
+    url: '/api/v1/vkid/logout'
 }); };

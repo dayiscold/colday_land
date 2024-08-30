@@ -1,6 +1,8 @@
 import uuid
 import pkce
 
+from application.vkid.client.exception import VKIDAuthException
+
 
 class VKIDPKCEStore:
     def __init__(self):
@@ -11,7 +13,7 @@ class VKIDPKCEStore:
         Generate state and pkce code_challenge
         :return: [0] - state, [1] - code_challenge
         """
-        code_verifier, code_challenge = pkce.generate_pkce_pair()
+        code_verifier, code_challenge = pkce.generate_pkce_pair(code_verifier_length=100)
         state = str(uuid.uuid4())
         self._store[state] = code_verifier
         return state, code_challenge
@@ -21,7 +23,10 @@ class VKIDPKCEStore:
         Get pkce code_verify by state
         :return: code_verify
         """
-        return self._store.get(state) or ""
+        code = self._store.get(state)
+        if not code:
+            raise VKIDAuthException(error_description="Неверный код для VKID")
+        return code
 
 
 vkid_store = VKIDPKCEStore()
