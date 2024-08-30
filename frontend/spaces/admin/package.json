@@ -10,8 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@colday/shared": "workspace:*",
     "@colday/api": "workspace:*",
+    "@colday/shared": "workspace:*",
     "@headlessui/react": "^2.1.2",
     "@heroicons/react": "^2.1.5",
     "@react-three/fiber": "^8.17.5",

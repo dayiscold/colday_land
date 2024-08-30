@@ -8,6 +8,7 @@ import VkAdminAboutPlayAudio from "@/views/admin/aboutPlayAudio.tsx";
 import VkAdminPhotos from "@/views/admin/photos.tsx";
 import VkAdminPhotoUpload from "@/views/admin/photoUpload.tsx";
 import VkAdminPhotoDelete from "@/views/admin/photoDelete.tsx";
+import {VKIDProfileProvider} from "@colday/shared/src/components/vkid/context";
 
 const AdminPagePanel = () => {
     const [
@@ -41,11 +42,13 @@ const AdminPagePanel = () => {
 const AdminPage = () => {
     return (
         <AppRoot mode="full">
-            <SplitLayout header={<PanelHeader delimiter="none"/>}>
-                <SplitCol autoSpaced>
-                    <AdminPagePanel/>
-                </SplitCol>
-            </SplitLayout>
+            <VKIDProfileProvider>
+                <SplitLayout header={<PanelHeader delimiter="none"/>}>
+                    <SplitCol autoSpaced>
+                        <AdminPagePanel/>
+                    </SplitCol>
+                </SplitLayout>
+            </VKIDProfileProvider>
         </AppRoot>
     );
 };

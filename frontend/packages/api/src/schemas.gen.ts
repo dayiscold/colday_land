@@ -27,6 +27,30 @@ export const $HTTPValidationError = {
     title: 'HTTPValidationError'
 } as const;
 
+export const $JWTModelProfile = {
+    properties: {
+        id: {
+            type: 'integer',
+            title: 'Идентификатор пользователя'
+        },
+        first_name: {
+            type: 'string',
+            title: 'Имя'
+        },
+        last_name: {
+            type: 'string',
+            title: 'Фамилия'
+        },
+        photo_max: {
+            type: 'string',
+            title: 'URL квадратной фотографии с максимальной шириной'
+        }
+    },
+    type: 'object',
+    required: ['id', 'first_name', 'last_name', 'photo_max'],
+    title: 'JWTModelProfile'
+} as const;
+
 export const $LinksSchema = {
     properties: {
         id: {
@@ -267,10 +291,14 @@ export const $VKIDFirstStepParams = {
         client_id: {
             type: 'string',
             title: 'Client Id'
+        },
+        redirect_uri: {
+            type: 'string',
+            title: 'Redirect Uri'
         }
     },
     type: 'object',
-    required: ['code_challenge', 'state', 'client_id'],
+    required: ['code_challenge', 'state', 'client_id', 'redirect_uri'],
     title: 'VKIDFirstStepParams'
 } as const;
 
@@ -287,10 +315,18 @@ export const $VKIDSecondStepParams = {
         device_id: {
             type: 'string',
             title: 'Device Id'
+        },
+        ext_id: {
+            type: 'string',
+            title: 'Ext Id'
+        },
+        type: {
+            type: 'string',
+            title: 'Type'
         }
     },
     type: 'object',
-    required: ['code', 'state', 'device_id'],
+    required: ['code', 'state', 'device_id', 'ext_id', 'type'],
     title: 'VKIDSecondStepParams'
 } as const;
 

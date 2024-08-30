@@ -1,10 +1,13 @@
-import aiohttp
-from pydantic import TypeAdapter
+import logging
 from socket import AF_INET
+from urllib.parse import urlencode
+
+import aiohttp
 
 from application.vkid.client.exception import VKIDAuthException
-from application.vkid.client.models import VKIDAccessToken
-from application.vkid.jwt_manager.model import JWTModelProfile
+from application.vkid.client.models import VKIDAccessToken, ResponseProfileListInfo
+
+logger = logging.getLogger(__name__)
 
 
 class VKIDClient:
@@ -48,19 +51,25 @@ class VKIDClient:
         Иначе ответ можно считать подмененным
         :return: Модель доступов
         """
+        params = {
+            "grant_type": grant_type,
+            "code_verifier": code_verifier,
+            "redirect_uri": redirect_uri,
+            "code": code,
+            "client_id": client_id,
+            "device_id": device_id,
+            "state": state,
+        }
+        logger.debug(f"VKIDClient.authorize on {params=}")
         response = await self.transport.post(
             url="https://id.vk.com/oauth2/auth",
-            params={
-                "grant_type": grant_type,
-                "code_verifier": code_verifier,
-                "redirect_uri": redirect_uri,
-                "code": code,
-                "client_id": client_id,
-                "device_id": device_id,
-                "state": state,
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
             },
+            data=urlencode(params),
         )
         payload = await response.json()
+        logger.debug(f"VKIDClient.authorize result on {payload=}")
         if "error" in payload:
             raise VKIDAuthException(error_description=payload.get("error_description"))
         return VKIDAccessToken.model_validate(obj=payload, strict=False)
@@ -70,21 +79,21 @@ class VKIDClient:
         access_token,
         user_ids: str,
         fields: str,
-    ) -> list[JWTModelProfile]:
-        response = await self.transport.post(
-            url="https://api.vk.com/method/users.get",
-            data={
-                "user_ids": user_ids,
-                "fields": fields,
-                "access_token": access_token,
-                "v": "5.199",
-            },
-        )
+    ) -> ResponseProfileListInfo:
+        data = {
+            "user_ids": user_ids,
+            "fields": fields,
+            "access_token": access_token,
+            "v": "5.199",
+        }
+        logger.debug(f"VKIDClient.get_profile_info on {data=}")
+        response = await self.transport.post(url="https://api.vk.com/method/users.get", data=data)
         payload = await response.json()
+        logger.debug(f"VKIDClient.get_profile_info result {payload=}")
         if "error" in payload:
             raise VKIDAuthException(error_description=((payload.get("error") or dict()).get("error_msg")) or "")
+        return ResponseProfileListInfo.model_validate(payload, strict=False)
 
-        return TypeAdapter[list[JWTModelProfile]].validate_python(object=payload, strict=False)
 
-
-vkid_client = VKIDClient()
+async def get_vkid_client() -> VKIDClient:
+    return VKIDClient()

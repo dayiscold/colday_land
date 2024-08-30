@@ -1,3 +1,3 @@
-from application.vkid.security.schema import HTTPBearerSecurity
+from application.vkid.security.schema import HTTPCookiesSecurity
 
-vk_security = HTTPBearerSecurity()
+vk_security = HTTPCookiesSecurity()

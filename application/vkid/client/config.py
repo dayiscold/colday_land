@@ -6,9 +6,6 @@ from functools import partial
 @dataclass
 class VKIDConfig:
     client_id: str = field(default_factory=partial(os.environ.get, "VK_CLIENT_ID", "1"))  # type: ignore[assignment]
-    client_secret: str = field(
-        default_factory=partial(os.environ.get, "VK_CLIENT_SECRET", "1")
-    )  # type: ignore[assignment]
     frontend_url: str = field(
         default_factory=partial(os.environ.get, "VK_REDIRECT_URL", "http://localhost:5183")
     )  # type: ignore[assignment]

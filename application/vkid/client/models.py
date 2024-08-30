@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 
+from application.vkid.jwt_manager.model import JWTModelProfile
+
 
 class VKIDFirstStepParams(BaseModel):
     code_challenge: str
@@ -7,12 +9,15 @@ class VKIDFirstStepParams(BaseModel):
     state: str
     scopes: str = "vkid.personal_info"
     client_id: str
+    redirect_uri: str
 
 
 class VKIDSecondStepParams(BaseModel):
     code: str
     state: str
     device_id: str
+    ext_id: str
+    type: str
 
 
 class VKIDAccessToken(BaseModel):
@@ -23,3 +28,7 @@ class VKIDAccessToken(BaseModel):
     user_id: int
     state: str | None = None
     scope: str | None = None
+
+
+class ResponseProfileListInfo(BaseModel):
+    response: list[JWTModelProfile] = []
