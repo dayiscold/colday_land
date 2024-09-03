@@ -65,9 +65,13 @@ class PhotoAddSchema(BaseModel):
 class ReturnPhotoFromId(BaseModel):
     id: int | None
 
+class ReleasesInfoEdit(BaseModel):
+    status: str
+
 
 def get_current_user(session: Session):
     pass
+
 
 
 def get_site_info(session: Session) -> SiteInfoSchema:
@@ -142,3 +146,19 @@ def return_photo_from_id(photo_id: int, session: Session) -> Iterator[bytes]:
     if not photo:
         raise HTTPException(status_code=404, detail="Фото не найдено")
     yield base64.b64decode(photo.content.encode("utf-8"))
+
+
+def change_current_release(release_info: ReleasesSchemaItem, session: Session) -> None:
+    with session.begin():
+        session.query(ReleasesInfo).delete()
+        session.add(
+            ReleasesInfo(
+                id=release_info.id,
+                created_at=release_info.created_at,
+                updated_at=release_info.updated_at,
+                description=release_info.description,
+                file_id=release_info.file_id,
+                link=release_info.link,
+            )
+        )
+        session.commit()

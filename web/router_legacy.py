@@ -1,7 +1,6 @@
 from fastapi import Request, UploadFile, Form, File, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.security import HTTPBasicCredentials
-
 from application.login_data import administration
 from application.uploaded_releases import uploaded_link_image, release_dates
 from .app import app, templates, security
