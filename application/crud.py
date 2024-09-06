@@ -65,8 +65,10 @@ class PhotoAddSchema(BaseModel):
 class ReturnPhotoFromId(BaseModel):
     id: int | None
 
+
 class ReturnReleaseFromId(BaseModel):
     id: int | None
+
 
 class ReleasesInfoEdit(BaseModel):
     status: str
@@ -74,7 +76,6 @@ class ReleasesInfoEdit(BaseModel):
 
 def get_current_user(session: Session):
     pass
-
 
 
 def get_site_info(session: Session) -> SiteInfoSchema:
@@ -109,8 +110,8 @@ def get_photo_releases_list(releases: str | None = None, session=Session) -> Rel
 
 
 def edit_site_info(
-    site_info: SiteInfoSchema,
-    session: Session,
+        site_info: SiteInfoSchema,
+        session: Session,
 ) -> None:
     with session.begin():
         session.query(SiteInfo).delete()
@@ -166,6 +167,7 @@ def change_current_release(release_info: ReleasesSchemaItem, session: Session) -
         )
         session.commit()
 
+
 def delete_current_release(id: ReturnReleaseFromId, session: Session) -> None:
     if id is None:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Не передан идентификатор релиза")
@@ -175,3 +177,17 @@ def delete_current_release(id: ReturnReleaseFromId, session: Session) -> None:
     session.delete(release)
     session.commit()
     return id.id
+
+
+def add_new_release(new_release: ReleasesSchemaItem, session: Session) -> ReleasesSchemaItem:
+    new_release_append = ReleasesInfo(
+        id=new_release.id,
+        created_at=new_release.created_at,
+        updated_at=new_release.updated_at,
+        description=new_release.description,
+        file_id=new_release.file_id,
+        link=new_release.link
+    )
+    session.add(new_release_append)
+    session.commit()
+    return new_release
