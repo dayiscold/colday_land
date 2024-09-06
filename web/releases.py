@@ -1,6 +1,6 @@
 from fastapi import Depends, Query
 
-from application.crud import get_db_session, get_photo_releases_list, ReleasesSchema, change_current_release, ReleasesInfoEdit, ReleasesSchemaItem
+from application.crud import get_db_session, get_photo_releases_list, ReleasesSchema, change_current_release, ReleasesInfoEdit, ReleasesSchemaItem, delete_current_release, ReturnReleaseFromId
 from web.app import app
 
 
@@ -17,3 +17,7 @@ async def change_release_handler(release: ReleasesSchemaItem, db=Depends(get_db_
     return ReleasesInfoEdit(status="ok")
 
 
+@app.delete("api/v1/releases/{release_id}", tags=["Releases"])
+async def delete_release_handler(release_id: int, db=Depends(get_db_session)) -> ReleasesInfoEdit:
+    delete_current_release(id=ReturnReleaseFromId(id=release_id), session=db)
+    return ReleasesInfoEdit(status="Релиз удален")

@@ -65,6 +65,9 @@ class PhotoAddSchema(BaseModel):
 class ReturnPhotoFromId(BaseModel):
     id: int | None
 
+class ReturnReleaseFromId(BaseModel):
+    id: int | None
+
 class ReleasesInfoEdit(BaseModel):
     status: str
 
@@ -162,3 +165,13 @@ def change_current_release(release_info: ReleasesSchemaItem, session: Session) -
             )
         )
         session.commit()
+
+def delete_current_release(id: ReturnReleaseFromId, session: Session) -> None:
+    if id is None:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Не передан идентификатор релиза")
+    release = session.query(ReleasesInfo).filter(ReleasesInfo.id == id.id).first()
+    if release is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Релиз не был найден")
+    session.delete(release)
+    session.commit()
+    return id.id
