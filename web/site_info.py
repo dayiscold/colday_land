@@ -1,6 +1,7 @@
 from fastapi import Depends
 
 from application.crud import get_site_info, edit_site_info, SiteInfoSchema, SiteInfoEdit, get_db_session
+from application.vkid.security import vk_security
 from web.app import app
 
 
@@ -11,7 +12,11 @@ async def read_site_info(db=Depends(get_db_session)) -> SiteInfoSchema:
 
 
 @app.post("/api/v1/site_info", tags=["Site info"])
-async def change_site_info(site_info: SiteInfoSchema, db=Depends(get_db_session)) -> SiteInfoEdit:
+async def change_site_info(
+    site_info: SiteInfoSchema,
+    db=Depends(get_db_session),
+    _=Depends(vk_security),
+) -> SiteInfoEdit:
     """Return changed information Links"""
     edit_site_info(site_info=site_info, session=db)
     return SiteInfoEdit(message="Успешно")
