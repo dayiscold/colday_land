@@ -66,6 +66,14 @@ class ReturnPhotoFromId(BaseModel):
     id: int | None
 
 
+class ReturnReleaseFromId(BaseModel):
+    id: int | None
+
+
+class ReleasesInfoEdit(BaseModel):
+    status: str
+
+
 def get_current_user(session: Session):
     pass
 
@@ -142,3 +150,44 @@ def return_photo_from_id(photo_id: int, session: Session) -> Iterator[bytes]:
     if not photo:
         raise HTTPException(status_code=404, detail="Фото не найдено")
     yield base64.b64decode(photo.content.encode("utf-8"))
+
+
+def change_current_release(release_info: ReleasesSchemaItem, session: Session) -> None:
+    with session.begin():
+        session.query(ReleasesInfo).delete()
+        session.add(
+            ReleasesInfo(
+                id=release_info.id,
+                created_at=release_info.created_at,
+                updated_at=release_info.updated_at,
+                description=release_info.description,
+                file_id=release_info.file_id,
+                link=release_info.link,
+            )
+        )
+        session.commit()
+
+
+def delete_current_release(id: ReturnReleaseFromId, session: Session) -> int | None:
+    if id.id is None:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Не передан идентификатор релиза")
+    release = session.query(ReleasesInfo).filter(ReleasesInfo.id == id.id).first()
+    if release is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Релиз не был найден")
+    session.delete(release)
+    session.commit()
+    return id.id
+
+
+def add_new_release(new_release: ReleasesSchemaItem, session: Session) -> ReleasesSchemaItem:
+    new_release_append = ReleasesInfo(
+        id=new_release.id,
+        created_at=new_release.created_at,
+        updated_at=new_release.updated_at,
+        description=new_release.description,
+        file_id=new_release.file_id,
+        link=new_release.link,
+    )
+    session.add(new_release_append)
+    session.commit()
+    return new_release
