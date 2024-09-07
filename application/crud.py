@@ -3,14 +3,11 @@ from datetime import datetime
 from http import HTTPStatus
 from typing import List, Iterator
 
-from fastapi import HTTPException, status, UploadFile
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import status, UploadFile, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from database import SiteInfo, SessionLocal, ReleasesInfo, PhotoFileReleases
-
-security = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def get_db_session():
