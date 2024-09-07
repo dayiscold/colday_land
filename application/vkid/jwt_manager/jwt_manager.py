@@ -8,7 +8,7 @@ from application.vkid.jwt_manager.model import JWTModelWithAccessToken, JWTModel
 
 class JWTManager:
     def __init__(self, secret: str | None = None):
-        self._secret = secret or os.urandom(64).decode("utf-8")
+        self._secret = secret or os.urandom(128)
         self._algorithm = ["HS256"]
 
     def encode(self, profile: JWTModelProfile) -> JWTModelWithAccessToken:
