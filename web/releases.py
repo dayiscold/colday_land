@@ -1,7 +1,16 @@
 from fastapi import Depends, Query
 
-from application.crud import get_db_session, get_photo_releases_list, ReleasesSchema, change_current_release, \
-    ReleasesInfoEdit, ReleasesSchemaItem, delete_current_release, ReturnReleaseFromId, add_new_release
+from application.crud import (
+    get_db_session,
+    get_photo_releases_list,
+    ReleasesSchema,
+    change_current_release,
+    ReleasesInfoEdit,
+    ReleasesSchemaItem,
+    delete_current_release,
+    ReturnReleaseFromId,
+    add_new_release,
+)
 from web.app import app
 
 
@@ -15,7 +24,6 @@ async def releases_handler(releases: str | None = Query(None), db=Depends(get_db
 async def add_release_handler(release: ReleasesSchemaItem, db=Depends(get_db_session)) -> ReleasesSchemaItem:
     """ADD NEW RELEASE"""
     return add_new_release(new_release=release, session=db)
-
 
 
 @app.post("/api/v1/releases/", tags=["Releases"])
