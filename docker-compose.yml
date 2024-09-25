@@ -1,0 +1,29 @@
+version: "3.7"
+
+services:
+  frontend_server:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: frontend
+    ports:
+      - 5000:5000
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:8080
+    container_name: frontend
+
+  backend_server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: backend
+    ports:
+      - 8080:8080
+    environment:
+      - .env-non-dev
+      - POSTGRES_HOST=postgres_server
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DATABASE=postgres
+      - REQUEST_ORIGIN=http://localhost
+    container_name: backend
