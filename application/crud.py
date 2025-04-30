@@ -3,14 +3,12 @@ from datetime import datetime
 from http import HTTPStatus
 from typing import List, Iterator
 
+from pydantic import BaseModel, Field
 from fastapi import HTTPException, status, UploadFile
-from fastapi.security import OAuth2PasswordBearer
-from pydantic import BaseModel
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from database import SiteInfo, SessionLocal, ReleasesInfo, PhotoFileReleases
-
-security = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def get_db_session():
@@ -29,15 +27,28 @@ class LinksSchema(BaseModel):
     path: str
 
 
+class SiteInfoPlayWidget(BaseModel):
+    title: str = Field(..., title="Название карточки")
+    description: str = Field(..., title="Описание карточки")
+    color: str = Field(..., title="Цвет текста на карточке")
+    color_card: str = Field(..., title="Цвет карточки")
+    url: str = Field(..., title="Ссылка при клике на 'Добавить в спотифай'")
+    button_name: str = Field("Добавить в спотифай", title="Надпись на кнопке 'Добавить в спотифай'")
+    photo_path: str = Field(..., title="Ссылка на картинку")
+    song_source: str = Field(..., title="Ссылка на просшивание")
+
+
 class SiteInfoSchema(BaseModel):
-    name: str
-    description: str
-    year: int = datetime.now().year
-    links: List[LinksSchema] | None
+    name: str = Field(..., title="Название сайта")
+    description: str = Field(..., title="Описание сайта")
+    year: int = Field(datetime.now().year, title="Год сайта")
+    links: List[LinksSchema] | None = Field(None, title="Список ссылок сайта")
+    play_widget: SiteInfoPlayWidget | None = Field(None, title="Виджет для получения проигрывателя")
 
 
 class SiteInfoLinksSchema(BaseModel):
-    links: List[LinksSchema] | None
+    links: List[LinksSchema] | None = None
+    play_widget: SiteInfoPlayWidget | None = None
 
 
 class SiteInfoEdit(BaseModel):
@@ -60,6 +71,10 @@ class ReleasesSchema(BaseModel):
 class PhotoAddSchema(BaseModel):
     id: int
     filename: str
+
+
+class PhotoListSchema(BaseModel):
+    photos: list[PhotoAddSchema] = []
 
 
 class ReturnPhotoFromId(BaseModel):
@@ -86,6 +101,7 @@ def get_site_info(session: Session) -> SiteInfoSchema:
         name=site_info.name,
         description=site_info.description,
         links=SiteInfoLinksSchema.model_validate(site_info.links).links,
+        play_widget=SiteInfoLinksSchema.model_validate(site_info.links).play_widget,
     )
 
 
@@ -109,6 +125,20 @@ def get_photo_releases_list(releases: str | None = None, session=Session) -> Rel
     return response
 
 
+def photo_list(session=Session) -> PhotoListSchema:
+    response = PhotoListSchema()
+    result = session.execute(select(PhotoFileReleases.id, PhotoFileReleases.filename))
+    photos = result.all()
+    for photo in photos:
+        response.photos.append(
+            PhotoAddSchema(
+                id=photo[0],
+                filename=photo[1],
+            )
+        )
+    return response
+
+
 def edit_site_info(
     site_info: SiteInfoSchema,
     session: Session,
@@ -120,7 +150,10 @@ def edit_site_info(
                 name=site_info.name,
                 description=site_info.description,
                 year=site_info.year,
-                links=SiteInfoLinksSchema(links=site_info.links).model_dump(mode="json"),
+                links=SiteInfoLinksSchema(
+                    links=site_info.links,
+                    play_widget=site_info.play_widget,
+                ).model_dump(mode="json"),
             )
         )
         session.commit()
